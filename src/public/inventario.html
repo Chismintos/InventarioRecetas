@@ -1,11 +1,91 @@
-<h1>Filtrar Recetas por Ingredientes</h1>
-<form action="/inventario" method="get">
-  <h3>Selecciona los ingredientes disponibles:</h3>
-  <ul>
-    <!-- Agregar checkboxes para seleccionar los ingredientes -->
-  </ul>
-  <button type="submit">Filtrar Recetas</button>
-</form>
-<div>
-  <!-- Mostrar las recetas filtradas aquí -->
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario de Recetas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .recetas {
+      margin-top: 20px;
+    }
+    .receta {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Filtrar Recetas por Ingredientes</h1>
+  <form id="formInventario">
+    <h3>Selecciona los ingredientes disponibles:</h3>
+    <ul>
+      <!-- Los ingredientes serán generados dinámicamente -->
+    </ul>
+    <button type="submit">Filtrar Recetas</button>
+  </form>
+  <div class="recetas" id="resultados">
+    <!-- Las recetas filtradas se mostrarán aquí -->
+  </div>
+
+  <script>
+    // Cargar ingredientes dinámicamente
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/ingredientes') // Endpoint que devuelve los ingredientes desde tu backend
+        .then(response => response.json())
+        .then(data => {
+          const ul = document.querySelector('ul');
+          ul.innerHTML = '';
+          data.forEach(ingrediente => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <label>
+                <input type="checkbox" value="${ingrediente.nombre}" />
+                ${ingrediente.nombre}
+              </label>
+            `;
+            ul.appendChild(li);
+          });
+        })
+        .catch(error => console.error('Error al cargar ingredientes:', error));
+    });
+
+    // Manejar el envío del formulario
+    document.getElementById('formInventario').addEventListener('submit', (e) => {
+      e.preventDefault(); // Evitar el envío tradicional del formulario
+
+      // Obtener los ingredientes seleccionados
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+      const ingredientes = Array.from(checkboxes).map(checkbox => checkbox.value);
+
+      // Enviar la consulta al backend
+      fetch(`/inventario/buscar?ingredientes=${ingredientes.join(',')}`)
+        .then(response => response.json())
+        .then(data => {
+          const resultados = document.getElementById('resultados');
+          resultados.innerHTML = ''; // Limpiar resultados previos
+          if (data.length === 0) {
+            resultados.innerHTML = '<p>No se encontraron recetas con los ingredientes seleccionados.</p>';
+            return;
+          }
+          data.forEach(receta => {
+            const div = document.createElement('div');
+            div.classList.add('receta');
+            div.innerHTML = `
+              <h3>${receta.nombre}</h3>
+              <p>${receta.descripcion}</p>
+            `;
+            resultados.appendChild(div);
+          });
+        })
+        .catch(error => {
+          console.error('Error al buscar recetas:', error);
+          document.getElementById('resultados').innerHTML = '<p>Hubo un error al buscar recetas.</p>';
+        });
+    });
+  </script>
+</body>
+</html>
