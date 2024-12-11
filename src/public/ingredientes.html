@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingredientes</title>
+</head>
+<body>
+  <h1>Ingredientes Disponibles</h1>
+  <p>Aquí puedes buscar y explorar todos los ingredientes disponibles.</p>
+
+  <!-- Barra de búsqueda -->
+  <input type="text" id="searchInput" placeholder="Buscar ingrediente por nombre">
+  <button onclick="searchIngredients()">Buscar</button>
+
+  <!-- Contenedor de ingredientes -->
+  <div id="ingredientsList"></div>
+
+  <a href="/">Regresar a la página principal</a>
+
+  <script>
+    // Función para obtener ingredientes de la base de datos
+    function fetchIngredients(query = '') {
+      fetch(`/ingredientes?nombre=${query}`)
+        .then(response => response.json())
+        .then(data => {
+          const ingredientsList = document.getElementById('ingredientsList');
+          ingredientsList.innerHTML = ''; // Limpiar la lista antes de mostrar nuevos ingredientes
+
+          // Mostrar mensaje si no hay ingredientes
+          if (data.length === 0) {
+            ingredientsList.innerHTML = '<p>No se encontraron ingredientes.</p>';
+            return;
+          }
+
+          // Mostrar los ingredientes
+          data.forEach(ingredient => {
+            const ingredientElement = document.createElement('div');
+            ingredientElement.innerHTML = `<h3>${ingredient.nombre}</h3>`;
+            ingredientsList.appendChild(ingredientElement);
+          });
+        })
+        .catch(error => {
+          console.error('Error al obtener los ingredientes:', error);
+        });
+    }
+
+    // Función para manejar la búsqueda
+    function searchIngredients() {
+      const searchQuery = document.getElementById('searchInput').value;
+      fetchIngredients(searchQuery);
+    }
+
+    // Obtener todos los ingredientes al cargar la página
+    fetchIngredients();
+  </script>
+</body>
+</html>

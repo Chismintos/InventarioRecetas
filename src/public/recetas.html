@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recetas</title>
+</head>
+<body>
+  <h1>Recetas Disponibles</h1>
+  <p>Aquí puedes buscar y explorar todas las recetas disponibles.</p>
+
+  <!-- Barra de búsqueda -->
+  <input type="text" id="searchInput" placeholder="Buscar receta por nombre">
+  <button onclick="searchRecipes()">Buscar</button>
+
+  <!-- Contenedor de recetas -->
+  <div id="recipesList"></div>
+
+  <a href="/">Regresar a la página principal</a>
+
+  <script>
+    // Función para obtener recetas de la base de datos
+    function fetchRecipes(query = '') {
+      fetch(`/recetas?nombre=${query}`)
+        .then(response => response.json())
+        .then(data => {
+          const recipesList = document.getElementById('recipesList');
+          recipesList.innerHTML = ''; // Limpiar la lista antes de mostrar nuevas recetas
+
+          // Mostrar mensaje si no hay recetas
+          if (data.length === 0) {
+            recipesList.innerHTML = '<p>No se encontraron recetas.</p>';
+            return;
+          }
+
+          // Mostrar las recetas
+          data.forEach(recipe => {
+            const recipeElement = document.createElement('div');
+            recipeElement.innerHTML = `
+              <h3>${recipe.nombre}</h3>
+              <p>${recipe.descripcion}</p>
+              <p><strong>Ingredientes:</strong> ${recipe.ingredientes}</p>
+              <p><strong>Instrucciones:</strong> ${recipe.instrucciones}</p>
+            `;
+            recipesList.appendChild(recipeElement);
+          });
+        })
+        .catch(error => {
+          console.error('Error al obtener las recetas:', error);
+        });
+    }
+
+    // Función para manejar la búsqueda
+    function searchRecipes() {
+      const searchQuery = document.getElementById('searchInput').value;
+      fetchRecipes(searchQuery);
+    }
+
+    // Obtener todas las recetas al cargar la página
+    fetchRecipes();
+  </script>
+</body>
+</html>
