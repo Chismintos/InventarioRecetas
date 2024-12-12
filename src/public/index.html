@@ -1,7 +1,86 @@
-<h1>Bienvenido a la Página de Recetas</h1>
-<p>Aquí puedes explorar nuestras recetas y encontrar nuevas ideas para cocinar.</p>
-<ul>
-  <li><a href="/recetas.html">Ver Recetas</a></li>
-  <li><a href="/ingredientes.html">Ver Ingredientes</a></li>
-  <li><a href="/inventario.html">Filtrar Recetas por Ingredientes</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bienvenido a la Página de Recetas</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff; /* Fondo azul suave */
+      color: #444; /* Texto en gris oscuro */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50; /* Color oscuro para el título */
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #7f8c8d; /* Gris suave para el texto */
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* Centra los enlaces horizontalmente */
+      gap: 20px; /* Espacio entre los enlaces */
+    }
+
+    li {
+      margin: 0; /* Elimina márgenes adicionales */
+    }
+
+    a {
+      text-decoration: none;
+      color: #fff;
+      background-color: #a8dadc; /* Color de fondo suave para los botones */
+      padding: 12px 24px;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      transition: background-color 0.3s;
+      display: inline-block; /* Permite que el enlace sea un bloque */
+    }
+
+    a:hover {
+      background-color: #80b3b8; /* Color ligeramente más oscuro para el hover */
+    }
+
+    /* Estilo para el contenedor principal */
+    .container {
+      background-color: #ffffff; /* Fondo blanco para el contenedor */
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 800px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Bienvenido a la Página de Recetas</h1>
+    <p>Aquí puedes explorar nuestras recetas y encontrar nuevas ideas para cocinar.</p>
+    <ul>
+      <li><a href="/recetas.html">Ver Recetas</a></li>
+      <li><a href="/ingredientes.html">Ver Ingredientes</a></li>
+      <li><a href="/inventario.html">Inventario de recetas</a></li>
+    </ul>
+  </div>
+</body>
+</html>

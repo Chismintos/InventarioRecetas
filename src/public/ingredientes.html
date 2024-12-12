@@ -4,19 +4,171 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ingredientes</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff; /* Fondo suave */
+      color: #444; /* Color de texto oscuro */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50; /* Título oscuro */
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #7f8c8d; /* Gris suave para el texto */
+      margin-bottom: 30px;
+    }
+
+    /* Estilo del contenedor del buscador */
+    #searchContainer {
+      margin-bottom: 40px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 400px; /* Máxima anchura para el input */
+      border: 2px solid #a8dadc;
+      border-radius: 5px;
+      margin-right: 10px;
+      outline: none;
+      box-sizing: border-box; /* Asegura que el padding no se agregue al ancho total */
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #a8dadc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #80b3b8; /* Efecto hover para el botón */
+    }
+
+    /* Contenedor de ingredientes */
+    #ingredientsList {
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 columnas por defecto */
+      gap: 20px;
+      justify-items: center;
+    }
+
+    .ingredient {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      text-align: center; /* Centramos el texto dentro de cada ingrediente */
+      transition: transform 0.2s;
+    }
+
+    .ingredient:hover {
+      transform: scale(1.05); /* Efecto de escala al pasar el ratón */
+    }
+
+    .ingredient h3 {
+      color: #2c3e50;
+    }
+
+    /* Enlace de regreso */
+    a {
+      color: #a8dadc;
+      text-decoration: none;
+      font-size: 1rem;
+      margin-top: 30px;
+      display: block;
+    }
+
+    a:hover {
+      color: #80b3b8; /* Efecto hover para el enlace */
+    }
+
+    /* Media Queries para pantallas más pequeñas */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+
+      input[type="text"] {
+        width: 80%; /* Reducir el tamaño en pantallas pequeñas */
+      }
+
+      /* Ajustar la vista del grid para pantallas más pequeñas */
+      #ingredientsList {
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas en pantallas medianas */
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+
+      input[type="text"] {
+        width: 100%; /* Campo de búsqueda ocupa toda la pantalla en dispositivos pequeños */
+      }
+
+      #ingredientsList {
+        grid-template-columns: 1fr; /* Una sola columna en pantallas muy pequeñas */
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Ingredientes Disponibles</h1>
-  <p>Aquí puedes buscar y explorar todos los ingredientes disponibles.</p>
+  <div class="container">
+    <h1>Ingredientes Disponibles</h1>
+    <p>Aquí puedes buscar y explorar todos los ingredientes disponibles.</p>
 
-  <!-- Barra de búsqueda -->
-  <input type="text" id="searchInput" placeholder="Buscar ingrediente por nombre">
-  <button onclick="searchIngredients()">Buscar</button>
+    <!-- Barra de búsqueda -->
+    <div id="searchContainer">
+      <input type="text" id="searchInput" placeholder="Buscar ingrediente por nombre">
+      <button onclick="searchIngredients()">Buscar</button>
+    </div>
 
-  <!-- Contenedor de ingredientes -->
-  <div id="ingredientsList"></div>
+    <!-- Contenedor de ingredientes -->
+    <div id="ingredientsList"></div>
 
-  <a href="/">Regresar a la página principal</a>
+    <a href="/">Regresar a la página principal</a>
+  </div>
 
   <script>
     // Función para obtener ingredientes de la base de datos
@@ -36,6 +188,7 @@
           // Mostrar los ingredientes
           data.forEach(ingredient => {
             const ingredientElement = document.createElement('div');
+            ingredientElement.classList.add('ingredient');
             ingredientElement.innerHTML = `<h3>${ingredient.nombre}</h3>`;
             ingredientsList.appendChild(ingredientElement);
           });

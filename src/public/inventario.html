@@ -7,62 +7,282 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
     }
-    .recetas {
+    h1 {
+      color: #2c3e50;;
+      text-align: center;
       margin-top: 20px;
     }
-    .receta {
-      border: 1px solid #ddd;
+    h3 {
+      color: #2c3e50;;
+    }
+    #formInventario {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .ingrediente {
+      display: inline-block;
       padding: 10px;
+      margin: 8px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .ingrediente:hover {
+      background-color: #e0f7fa;
+    }
+    .ingrediente.seleccionado {
+      background-color: #81d4fa;
+    }
+    .caja-ingredientes {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .ingrediente-caja {
+      display: flex;
+      align-items: center;
+      padding: 8px 15px;
+      background-color: #f5f5f5;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      justify-content: space-between;
+      width: 100%; /* Asegura que los ingredientes ocupen toda la fila */
+    }
+    .ingrediente-caja span {
+      margin-right: 15px; /* Espacio entre el nombre del ingrediente y el botón */
+    }
+    .boton-borrar {
+      background-color: #FF5733;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px; /* Ajustar el tamaño del texto */
+    }
+    .boton-borrar:hover {
+      background-color: #c0392b;
+    }
+    .recetas {
+      margin-top: 30px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .receta {
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .receta h3 {
+      color: #2c3e50;
       margin-bottom: 10px;
+    }
+    .receta p {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .mostrar-instrucciones {
+      background-color: #a8dadc;;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-size: 14px; /* Ajustar el tamaño del texto */
+    }
+    .mostrar-instrucciones:hover {
+      background-color: #8bccce;
+    }
+    .instrucciones {
+      margin-top: 15px;
+      display: none;
+    }
+    button {
+      background-color: #a8dadc;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+      font-size: 14px; /* Ajustar el tamaño del texto */
+    }
+    button:hover {
+      background-color: #8bccce;
     }
   </style>
 </head>
 <body>
   <h1>Filtrar Recetas por Ingredientes</h1>
+
   <form id="formInventario">
     <h3>Selecciona los ingredientes disponibles:</h3>
-    <ul>
-      <!-- Los ingredientes serán generados dinámicamente -->
-    </ul>
+    <div id="listaIngredientes"></div>
+    <button type="button" id="agregarIngrediente">Agregar a Inventario</button>
+
+    <h3>Ingredientes en el inventario:</h3>
+    <div class="caja-ingredientes" id="cajaIngredientes"></div>
+
     <button type="submit">Filtrar Recetas</button>
   </form>
-  <div class="recetas" id="resultados">
-    <!-- Las recetas filtradas se mostrarán aquí -->
-  </div>
+
+  <div class="recetas" id="resultados"></div>
 
   <script>
+    let ingredientesSeleccionados = [];
+    let todosLosIngredientes = []; // Para almacenar todos los ingredientes
+
     // Cargar ingredientes dinámicamente
     document.addEventListener('DOMContentLoaded', () => {
       fetch('/ingredientes') // Endpoint que devuelve los ingredientes desde tu backend
-        .then(response => response.json())
-        .then(data => {
-          const ul = document.querySelector('ul');
-          ul.innerHTML = '';
-          data.forEach(ingrediente => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-              <label>
-                <input type="checkbox" value="${ingrediente.nombre}" />
-                ${ingrediente.nombre}
-              </label>
-            `;
-            ul.appendChild(li);
-          });
+        .then(response => {
+          if (!response.ok) throw new Error('Error al cargar ingredientes.');
+          return response.json();
         })
-        .catch(error => console.error('Error al cargar ingredientes:', error));
+        .then(data => {
+          todosLosIngredientes = data; // Guardamos todos los ingredientes
+          actualizarListaIngredientes(data);
+        })
+        .catch(error => {
+          console.error('Error al cargar ingredientes:', error);
+          alert('Hubo un problema al cargar los ingredientes. Por favor, intenta nuevamente más tarde.');
+        });
     });
 
-    // Manejar el envío del formulario
-    document.getElementById('formInventario').addEventListener('submit', (e) => {
-      e.preventDefault(); // Evitar el envío tradicional del formulario
+    // Actualizar la lista de ingredientes filtrados
+    function actualizarListaIngredientes(ingredientes) {
+      const ul = document.getElementById('listaIngredientes');
+      ul.innerHTML = ''; // Limpiar la lista actual
+      if (ingredientes.length === 0) {
+        ul.innerHTML = '<div>No se encontraron ingredientes.</div>';
+        return;
+      }
+      ingredientes.forEach(ingrediente => {
+        const div = document.createElement('div');
+        div.classList.add('ingrediente');
+        div.innerHTML = ingrediente.nombre;
+        div.dataset.nombre = ingrediente.nombre;
+        ul.appendChild(div);
+      });
 
-      // Obtener los ingredientes seleccionados
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-      const ingredientes = Array.from(checkboxes).map(checkbox => checkbox.value);
+      // Selección de ingredientes al hacer clic
+      document.querySelectorAll('.ingrediente').forEach(ingredienteDiv => {
+        ingredienteDiv.addEventListener('click', () => {
+          ingredienteDiv.classList.toggle('seleccionado');
+        });
+      });
+    }
 
-      // Enviar la consulta al backend
-      fetch(`/inventario/buscar?ingredientes=${ingredientes.join(',')}`)
+    // Manejar el agregar a inventario
+document.getElementById('agregarIngrediente').addEventListener('click', () => {
+  const ingredientesSeleccionadosDiv = document.querySelectorAll('.ingrediente.seleccionado');
+  ingredientesSeleccionadosDiv.forEach(ingredienteDiv => {
+    if (!ingredientesSeleccionados.includes(ingredienteDiv.dataset.nombre)) {
+      ingredientesSeleccionados.push(ingredienteDiv.dataset.nombre);
+
+      const divIngrediente = document.createElement('div');
+      divIngrediente.classList.add('ingrediente-caja');
+      
+      const nombreIngrediente = document.createElement('span');
+      nombreIngrediente.textContent = ingredienteDiv.dataset.nombre;
+
+      const botonBorrar = document.createElement('button');
+      botonBorrar.classList.add('boton-borrar');
+      botonBorrar.textContent = 'Borrar';
+
+      // Alinear el nombre del ingrediente y el botón
+      divIngrediente.appendChild(nombreIngrediente);
+      divIngrediente.appendChild(botonBorrar);
+
+      // Agregar el ingrediente a la caja
+      document.getElementById('cajaIngredientes').appendChild(divIngrediente);
+
+      // Eliminar el ingrediente del inventario y actualizar el arreglo
+      botonBorrar.addEventListener('click', () => {
+        // Eliminar el ingrediente del arreglo de seleccionados
+        ingredientesSeleccionados = ingredientesSeleccionados.filter(ingrediente => ingrediente !== ingredienteDiv.dataset.nombre);
+        
+        // Eliminar el ingrediente de la vista
+        divIngrediente.remove();
+
+        // Si ya no hay ingredientes seleccionados, limpiar los resultados de recetas
+        if (ingredientesSeleccionados.length === 0) {
+          document.getElementById('resultados').innerHTML = '<p>No hay ingredientes en el inventario. Por favor, agrega algunos ingredientes para buscar recetas.</p>';
+        }
+      });
+    }
+  });
+});
+
+// Manejar el envío del formulario para buscar recetas
+document.getElementById('formInventario').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  if (ingredientesSeleccionados.length === 0) {
+    alert('Por favor, agrega al menos un ingrediente al inventario.');
+    return;
+  }
+
+  // Enviar la consulta al backend con los ingredientes actuales
+  fetch(`/inventario/buscar?ingredientes=${ingredientesSeleccionados.join(',')}`)
+    .then(response => {
+      if (!response.ok) throw new Error('Error al buscar recetas.');
+      return response.json();
+    })
+    .then(data => {
+      const resultados = document.getElementById('resultados');
+      resultados.innerHTML = ''; // Limpiar resultados previos
+      if (data.length === 0) {
+        resultados.innerHTML = '<p>No se encontraron recetas con los ingredientes seleccionados.</p>';
+        return;
+      }
+      data.forEach(receta => {
+        const div = document.createElement('div');
+        div.classList.add('receta');
+        div.innerHTML = `
+          <h3>${receta.nombre}</h3>
+          <p>${receta.descripcion}</p>
+          <button class="mostrar-instrucciones">Mostrar Instrucciones</button>
+          <div class="instrucciones">${receta.instrucciones}</div>
+        `;
+        resultados.appendChild(div);
+
+        // Mostrar/Ocultar instrucciones
+        div.querySelector('.mostrar-instrucciones').addEventListener('click', () => {
+          const instrucciones = div.querySelector('.instrucciones');
+          const boton = div.querySelector('.mostrar-instrucciones');
+          instrucciones.style.display = instrucciones.style.display === 'none' ? 'block' : 'none';
+          boton.textContent = instrucciones.style.display === 'none' ? 'Mostrar Instrucciones' : 'Ocultar Instrucciones';
+        });
+      });
+    })
+    .catch(error => {
+      console.error('Error al obtener recetas:', error);
+      alert('Hubo un problema al buscar las recetas. Por favor, intenta nuevamente más tarde.');
+    });
+});
+
+
+    // Función para actualizar las recetas
+    function actualizarRecetas() {
+      if (ingredientesSeleccionados.length === 0) return;
+
+      fetch(`/inventario/buscar?ingredientes=${ingredientesSeleccionados.join(',')}`)
         .then(response => response.json())
         .then(data => {
           const resultados = document.getElementById('resultados');
@@ -77,15 +297,13 @@
             div.innerHTML = `
               <h3>${receta.nombre}</h3>
               <p>${receta.descripcion}</p>
+              <button class="mostrar-instrucciones">Mostrar Instrucciones</button>
+              <div class="instrucciones">${receta.instrucciones}</div>
             `;
             resultados.appendChild(div);
           });
-        })
-        .catch(error => {
-          console.error('Error al buscar recetas:', error);
-          document.getElementById('resultados').innerHTML = '<p>Hubo un error al buscar recetas.</p>';
         });
-    });
+    }
   </script>
 </body>
 </html>
